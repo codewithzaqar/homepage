@@ -9,6 +9,7 @@ body {
   height: 100vh;
   background-color: var(--bg-color, #f0f0f0);
   color: var(--text-color, #000);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .container {
@@ -19,55 +20,75 @@ body {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   max-width: 600px;
   width: 90%;
+  transition: box-shadow 0.3s ease;
+}
+
+.container:hover {
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
 
 ul {
   padding: 0;
   list-style: none;
+  margin: 20px 0;
 }
 
 li {
-  margin: 5px 0;
+  margin: 10px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
 }
 
 a {
   color: var(--link-color, #007bff);
   text-decoration: none;
+  flex-grow: 1;
 }
 
 a:hover {
   text-decoration: underline;
 }
 
+button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  background: var(--link-color, #007bff);
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background: #0056b3;
+  transform: scale(1.05);
+}
+
+button.delete {
+  background: #ff4d4d;
+}
+
+button.delete:hover {
+  background: #cc0000;
+}
+
 /* Dark Mode */
 body.dark {
   --bg-color: #121212;
   --text-color: #fff;
-  --link-color: #BB86FC;
+  --link-color: #bb86fc;
 }
 
-/* Buttons */
-button {
-    margin-top: 10px;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    background: var(--link-color, #007BFF);
-    color: white;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #0056b3;
-}
-
-/* Responsive Design */
-@media (max-width: 600px) {
-  .container {
-    padding: 15px;
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
   }
-
-  h1 {
-    font-size: 1.5em;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
