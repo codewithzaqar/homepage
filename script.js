@@ -1,15 +1,16 @@
 document.addEventListener("DOMContentLoaded", () => {
   const timeEl = document.getElementById("time");
+  const greetingEl = document.getElementById("greeting");
   const quickLinksEl = document.getElementById("quick-links");
   const addLinkBtn = document.getElementById("add-link");
-  const darkModeToggle = document.getElementById("dark-mode-toggle");
   const searchInput = document.getElementById("search");
   const searchButton = document.getElementById("search-button");
   const offlineStatus = document.getElementById("offline-status");
+  const darkModeToggle = document.getElementById("dark-mode-toggle");
   const backgroundSettings = document.getElementById("background-settings");
-  const greetingEl = document.getElementById("greeting");
+  const weatherEl = document.getElementById("weather");
 
-  // Time
+  // Update Time
   function updateTime() {
     const now = new Date();
     timeEl.textContent = now.toLocaleTimeString();
@@ -17,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(updateTime, 1000);
   updateTime();
 
-  // Greeting
+  // Set Greeting
   function setGreeting() {
     const hour = new Date().getHours();
     greetingEl.textContent =
@@ -29,13 +30,28 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   setGreeting();
 
-  // Links Management
+  // Weather Widget
+  async function fetchWeather() {
+    try {
+      const response = await fetch(
+        "https://api.open-meteo.com/v1/forecast?latitude=40.7128&longitude=-74.0060&current_weather=true"
+      );
+      const data = await response.json();
+      const temp = data.current_weather.temperature;
+      const condition = data.current_weather.weathercode;
+      weatherEl.textContent = `🌡️ ${temp}°C - ${condition}`;
+    } catch (error) {
+      weatherEl.textContent = "Unable to fetch weather.";
+    }
+  }
+  fetchWeather();
+
+  // Manage Links
   function loadLinks() {
     const links = JSON.parse(localStorage.getItem("quickLinks")) || [];
     quickLinksEl.innerHTML = "";
     links.forEach((link, index) => {
       const li = document.createElement("li");
-      li.draggable = true;
       li.innerHTML = `
           <a href="${link.url}" target="_blank">${link.name}</a>
           <button class="delete" data-index="${index}">X</button>
@@ -43,18 +59,15 @@ document.addEventListener("DOMContentLoaded", () => {
       quickLinksEl.appendChild(li);
     });
 
-    // Attach delete functionality
+    // Add delete functionality
     document
       .querySelectorAll(".delete")
       .forEach((btn) => btn.addEventListener("click", deleteLink));
-
-    // Drag and drop
-    addDragAndDrop();
   }
 
   function addLink() {
     const url = prompt("Enter the URL:");
-    const name = prompt("Enter the name:");
+    const name = prompt("Enter the name for this link:");
     if (url && name) {
       const links = JSON.parse(localStorage.getItem("quickLinks")) || [];
       links.push({ url, name });
@@ -63,22 +76,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function deleteLink(e) {
-    const index = e.target.dataset.index;
+  function deleteLink(event) {
+    const index = event.target.dataset.index;
     const links = JSON.parse(localStorage.getItem("quickLinks")) || [];
     links.splice(index, 1);
     localStorage.setItem("quickLinks", JSON.stringify(links));
     loadLinks();
   }
-
-  // Dark Mode
-  function toggleDarkMode() {
-    const isDark = document.body.classList.toggle("dark");
-    localStorage.setItem("darkMode", JSON.stringify(isDark));
-  }
-
-  const isDarkMode = JSON.parse(localStorage.getItem("darkMode")) || false;
-  if (isDarkMode) document.body.classList.add("dark");
 
   // Search
   searchButton.addEventListener("click", () => {
@@ -90,15 +94,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Offline Detection
-  function updateOfflineStatus() {
-    offlineStatus.hidden = navigator.onLine;
+  // Dark Mode
+  function toggleDarkMode() {
+    const isDark = document.body.classList.toggle("dark");
+    localStorage.setItem("darkMode", JSON.stringify(isDark));
   }
-  window.addEventListener("online", updateOfflineStatus);
-  window.addEventListener("offline", updateOfflineStatus);
-  updateOfflineStatus();
+  const savedDarkMode = JSON.parse(localStorage.getItem("darkMode"));
+  if (savedDarkMode) document.body.classList.add("dark");
 
-  // Background Customization
+  // Background Settings
   backgroundSettings.addEventListener("click", () => {
     const background = prompt(
       "Enter a background color (e.g., #ffcc00) or an image URL:"
@@ -111,7 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Restore Background
   const savedBackground = localStorage.getItem("background");
   if (savedBackground) {
     document.body.style.background = savedBackground.includes("http")
@@ -119,55 +122,15 @@ document.addEventListener("DOMContentLoaded", () => {
       : savedBackground;
   }
 
+  // Offline Detection
+  function updateOfflineStatus() {
+    offlineStatus.hidden = navigator.onLine;
+  }
+  window.addEventListener("online", updateOfflineStatus);
+  window.addEventListener("offline", updateOfflineStatus);
+  updateOfflineStatus();
+
   addLinkBtn.addEventListener("click", addLink);
   darkModeToggle.addEventListener("click", toggleDarkMode);
   loadLinks();
-
-  // Drag-and-Drop Support
-  function addDragAndDrop() {
-    let draggingEl = null;
-    quickLinksEl.addEventListener("dragstart", (e) => {
-      draggingEl = e.target;
-      draggingEl.classList.add("dragging");
-    });
-
-    quickLinksEl.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      const afterElement = getDragAfterElement(quickLinksEl, e.clientY);
-      if (afterElement == null) {
-        quickLinksEl.appendChild(draggingEl);
-      } else {
-        quickLinksEl.insertBefore(draggingEl, afterElement);
-      }
-    });
-
-    quickLinksEl.addEventListener("dragend", () => {
-      draggingEl.classList.remove("dragging");
-      saveLinksOrder();
-    });
-  }
-
-  function getDragAfterElement(container, y) {
-    const elements = [...container.querySelectorAll("li:not(.dragging)")];
-    return elements.reduce(
-      (closest, child) => {
-        const box = child.getBoundingClientRect();
-        const offset = y - box.top - box.height / 2;
-        if (offset < 0 && offset > closest.offset) {
-          return { offset, element: child };
-        }
-        return closest;
-      },
-      { offset: Number.NEGATIVE_INFINITY }
-    ).element;
-  }
-
-  function saveLinksOrder() {
-    const links = [];
-    quickLinksEl.querySelectorAll("li").forEach((li) => {
-      const a = li.querySelector("a");
-      links.push({ url: a.href, name: a.textContent });
-    });
-    localStorage.setItem("quickLinks", JSON.stringify(links));
-  }
 });
