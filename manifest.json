@@ -1,0 +1,16 @@
+{
+    "manifest_version": 3,
+    "name": "Custom Homepage",
+    "version": "1.0",
+    "description": "A custom homepage for Chrome.",
+    "chrome_url_overrides": {
+      "newtab": "homepage.html"
+    },
+    "icons": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    },
+    "permissions": []
+  }
+  
