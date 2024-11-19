@@ -1,27 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Custom Homepage</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <div class="container">
-      <header>
-        <h1 id="greeting" aria-label="Personalized Greeting"></h1>
-      </header>
-      <main>
-        <div id="time" aria-live="polite"></div>
-        <p>Your Quick Links:</p>
-        <ul id="quick-links"></ul>
-        <button id="add-link" aria-label="Add a new link">Add New Link</button>
-      </main>
-      <footer>
-        <button id="dark-mode-toggle" aria-label="Toggle dark mode">Toggle Dark Mode</button>
-        <p>&copy; 2024 Custom Homepage</p>
-      </footer>
-    </div>
-    <script src="script.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Homepage</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1 id="greeting" aria-label="Personalized Greeting"></h1>
+    </header>
+    <main>
+      <div id="time" aria-live="polite"></div>
+      <div class="search-bar">
+        <input type="text" id="search" placeholder="Search the web..." />
+        <button id="search-button" aria-label="Search">Search</button>
+      </div>
+      <p>Your Quick Links:</p>
+      <ul id="quick-links" role="list"></ul>
+      <button id="add-link" aria-label="Add a new link">Add New Link</button>
+    </main>
+    <footer>
+      <div id="offline-status" hidden>⚠️ You are offline.</div>
+      <button id="background-settings" aria-label="Set background">Set Background</button>
+      <button id="dark-mode-toggle" aria-label="Toggle dark mode">Toggle Dark Mode</button>
+      <p>&copy; 2024 Custom Homepage</p>
+    </footer>
+  </div>
+  <script src="script.js"></script>
+</body>
 </html>
