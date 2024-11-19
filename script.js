@@ -1,38 +1,64 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const timeEl = document.getElementById("time");
+    const quickLinksEl = document.getElementById("quick-links");
+    const addLinkBtn = document.getElementById("add-link");
+    const darkModeToggle = document.getElementById("dark-mode-toggle");
+    const greetingEl = document.getElementById("greeting");
+  
     // Display Current Time
-    const timeEl = document.getElementById("time")
     function updateTime() {
-        const now = new Date()
-        timeEl.textContent = now.toLocaleTimeString()
+      const now = new Date();
+      timeEl.textContent = now.toLocaleTimeString();
     }
-    updateTime()
-    setInterval(updateTime, 1000)
-
-    // Add New Link
-    const quickLinks = document.getElementById("quick-links")
-    const addLinkBtn = document.getElementById("add-link")
-
-    addLinkBtn.addEventListener("click", () => {
-        const url = prompt("Enter the URL:")
-        const name = prompt("Enter the name for this link:")
-        if (url && name) {
-            const li = document.createElement("li")
-            li.innerHTML = `a href="${url}" target="_blank">${name}</a>`
-            quickLinks.appendChild(li)
-        }
-    })
-
-    // Dark Mode Toggle
-    let isDarkMode = false
-    const toggleDarkMode = () => {
-        document.body.classList.toggle("dark", isDarkMode)
-        isDarkMode = !isDarkMode
+    setInterval(updateTime, 1000);
+    updateTime();
+  
+    // Set Greeting
+    function setGreeting() {
+      const hour = new Date().getHours();
+      const greeting =
+        hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
+      greetingEl.textContent = `${greeting}, User!`;
     }
-
-    // Optional: Add a toggle button for dark mode
-    const footer = document.querySelector("footer")
-    const darkModeBtn = document.createElement("button")
-    darkModeBtn.textContent = "Toggle Dark Mode"
-    darkModeBtn.addEventListener("click", toggleDarkMode)
-    footer.appendChild(darkModeBtn)
-})
+    setGreeting();
+  
+    // Manage Links in localStorage
+    function loadLinks() {
+      const links = JSON.parse(localStorage.getItem("quickLinks")) || [];
+      quickLinksEl.innerHTML = ""; // Clear current links
+      links.forEach((link) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<a href="${link.url}" target="_blank">${link.name}</a>`;
+        quickLinksEl.appendChild(li);
+      });
+    }
+  
+    function addLink() {
+      const url = prompt("Enter the URL:");
+      const name = prompt("Enter the name for this link:");
+      if (url && name) {
+        const links = JSON.parse(localStorage.getItem("quickLinks")) || [];
+        links.push({ url, name });
+        localStorage.setItem("quickLinks", JSON.stringify(links));
+        loadLinks();
+      }
+    }
+  
+    addLinkBtn.addEventListener("click", addLink);
+    loadLinks();
+  
+    // Dark Mode
+    function applyDarkMode(isDark) {
+      document.body.classList.toggle("dark", isDark);
+      localStorage.setItem("darkMode", isDark);
+    }
+  
+    const isDarkMode = JSON.parse(localStorage.getItem("darkMode")) || false;
+    applyDarkMode(isDarkMode);
+  
+    darkModeToggle.addEventListener("click", () => {
+      const currentMode = document.body.classList.contains("dark");
+      applyDarkMode(!currentMode);
+    });
+  });
+  
